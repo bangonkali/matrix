@@ -16,6 +16,12 @@ The main challenge is making a library that does Matrix Multiplication using Str
 * Optimize using SIMD
 
 This has been a very educational project for the author.
+
+\section sec_references References
+
+[Intel Strassen's Matrix Multiplication Algorithm
+](https://software.intel.com/sites/default/files/m/c/d/5/3/d/24469-Strassen_akki.pdf)
+
 */
 
 /*! \page pageUsage Usage
@@ -99,12 +105,4 @@ This project was made to address the challenges listed in \ref sec_challenges. E
 
     return 0;
     }
-
-__This is a work in progress__
-
-\subsection subsection3 References
-
-[Intel Strassen's Matrix Multiplication Algorithm
-](https://software.intel.com/sites/default/files/m/c/d/5/3/d/24469-Strassen_akki.pdf)
-
 */
