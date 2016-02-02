@@ -8,31 +8,27 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/** Matrix Elements
+ * This is done this way so that it will be easy to change the type of the elements.
+ */
 typedef double element;
 
+/** Matrix Structure
+ * Stores the region of interest and the size of the matrix. Also includes the pointer to the Matrix Data.
+ */
 typedef struct _Matrix {
-    int rs;
-    int re;
-    int cs;
-    int ce;
-    int size;
-    element *Mat;
+    int rs; /*!< Region of Interest row start.  */
+    int re; /*!< Region of Interest rew end.  */
+    int cs; /*!< Region of Interest columns start.  */
+    int ce; /*!< Region of Interest columns end.  */
+    int size; /*!< Size of Matrix (currently not utilized. To be used for optimized array creation.  */
+    element *Mat; /*!< Matrix data.  */
 } mlMat;
-
-typedef struct _MatrixHeader {
-    int rs;
-    int re;
-    int cs;
-    int ce;
-} mlHeader;
 
 mlMat * mlNewMat(int size);
 mlMat * mlCopyToNewMat(const mlMat *src, int size);
 void mlCopyToExistingMat(const mlMat *src, mlMat **dest, int size);
 int mlIsArrEquals(const element *arr1, const element *arr2, const int size);
-void mlInitZeroes(element *array, int size);
-void mlInitMat(element **array, int size);
-void mlDisposeMatArray(element **array);
 void mlDisposeMat(mlMat **mat);
 
 #endif //MATRIXOPERATIONS_MATRIX_H

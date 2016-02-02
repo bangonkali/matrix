@@ -4,7 +4,7 @@
 #include "ml_mult.h"
 
 int main() {
-    for (int size = 2; size <= 4096; size*=2){
+    for (int size = 2; size <= 64; size*=2){
         int next = (element) pow(2, ceil(log(size) / log(2)));
 
         mlMat *mD;

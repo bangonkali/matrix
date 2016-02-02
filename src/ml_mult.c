@@ -5,9 +5,10 @@
 #include "ml_mult.h"
 
 void mlMultiplyStrassen(const mlMat *A, const mlMat *B, mlMat **C, int size, int offset, int request) {
-//    mlPrintSpaces(offset);
-//    printf("offset: %2.2d request: %2.2d\n", offset, request);
-
+#ifdef DEBUG
+    mlPrintSpaces(offset);
+    printf("offset: %2.2d request: %2.2d\n", offset, request);
+#endif
 
     int m1_rows, m1_cols;
     int rows, cols;
@@ -22,18 +23,7 @@ void mlMultiplyStrassen(const mlMat *A, const mlMat *B, mlMat **C, int size, int
     mlMat *PM1, *PM2, *PM3, *PM4;
     mlMat *Q1P1, *Q1M1, *Q4P1, *Q4M1;
 
-    if (n != n2) {
-        printf("Error State.\n");
-        exit(EXIT_FAILURE);
-    }
-
     if (n <= 1 || n2 <= 1) {
-
-        if (n != n2) {
-            printf("Error State.\n");
-            exit(EXIT_FAILURE);
-        }
-
         element a, b, c, d, e, f, g, h;
         mlCopyToExistingMat(A, C, size);
 
@@ -42,30 +32,14 @@ void mlMultiplyStrassen(const mlMat *A, const mlMat *B, mlMat **C, int size, int
         (*C)->rs = 0;
         (*C)->re = 1;
 
-        #pragma omp parallel sections
         {
-            #pragma omp section
             { a = A->Mat[(A->rs) * size + (A->cs)]; }
-
-            #pragma omp section
             { c = A->Mat[(A->rs + 1) * size + (A->cs)]; }
-
-            #pragma omp section
             { b = A->Mat[(A->rs) * size + (A->cs + 1)]; }
-
-            #pragma omp section
             { d = A->Mat[(A->rs + 1) * size + (A->cs + 1)]; }
-
-            #pragma omp section
             { e = B->Mat[(B->rs) * size + (B->cs)]; }
-
-            #pragma omp section
             { g = B->Mat[(B->rs + 1) * size + (B->cs)]; }
-
-            #pragma omp section
             { f = B->Mat[(B->rs) * size + (B->cs + 1)]; }
-
-            #pragma omp section
             { h = B->Mat[(B->rs + 1) * size + (B->cs + 1)]; }
         }
 
@@ -75,11 +49,6 @@ void mlMultiplyStrassen(const mlMat *A, const mlMat *B, mlMat **C, int size, int
         (*C)->Mat[(((*C)->rs + 1) * size) + ((*C)->cs + 1)] = (c * f) + (d * h);
 
         return;
-    }
-
-    if (A->cs < 0 || A->ce < 1 || B->cs < 0 || B->ce < 1 || A->rs < 0 || A->re < 1 || B->rs < 0 || B->re < 1) {
-        printf("Error State.\n");
-        exit(EXIT_FAILURE);
     }
 
     mlCopyToExistingMat(A, C, size);
@@ -124,95 +93,75 @@ void mlMultiplyStrassen(const mlMat *A, const mlMat *B, mlMat **C, int size, int
     Q1M1 = mlNewMat(size);
     Q4M1 = mlNewMat(size);
 
-    A11->rs = A->rs; // Fixed;
-    A11->re = (((A->re - A->rs + 1) / 2) + A->rs) - 1; // Fixed
-    A11->cs = A->cs; // Fixed
-    A11->ce = (((A->ce - A->cs + 1) / 2) + A->cs) - 1; // Fixed
+    A11->rs = A->rs;
+    A11->re = (((A->re - A->rs + 1) / 2) + A->rs) - 1;
+    A11->cs = A->cs;
+    A11->ce = (((A->ce - A->cs + 1) / 2) + A->cs) - 1;
 
-    A12->rs = A->cs; // Fixed
-    A12->re = (((A->re - A->rs + 1) / 2) + A->rs) - 1; // Fixed
-    A12->cs = ((A->ce - A->cs + 1) / 2) + A->cs; // Fixed
-    A12->ce = A->ce; // Fixed
+    A12->rs = A->cs;
+    A12->re = (((A->re - A->rs + 1) / 2) + A->rs) - 1;
+    A12->cs = ((A->ce - A->cs + 1) / 2) + A->cs;
+    A12->ce = A->ce;
 
-    A21->rs = ((A->re - A->rs + 1) / 2) + A->rs; // Fixed
-    A21->re = A->re; // Fixed
-    A21->cs = A->cs; // Fixed
-    A21->ce = (((A->ce - A->cs + 1) / 2) + A->cs) - 1; // Fixed
+    A21->rs = ((A->re - A->rs + 1) / 2) + A->rs;
+    A21->re = A->re;
+    A21->cs = A->cs;
+    A21->ce = (((A->ce - A->cs + 1) / 2) + A->cs) - 1;
 
-    A22->rs = ((A->re - A->rs + 1) / 2) + A->rs; // Fixed
+    A22->rs = ((A->re - A->rs + 1) / 2) + A->rs;
     A22->re = A->re; //
-    A22->cs = ((A->ce - A->cs + 1) / 2) + A->cs; // Fixed
+    A22->cs = ((A->ce - A->cs + 1) / 2) + A->cs;
     A22->ce = A->ce;
 
-    B11->rs = B->rs; // Fixed;
-    B11->re = (((B->re - B->rs + 1) / 2) + B->rs) - 1; // Fixed
-    B11->cs = B->cs; // Fixed
-    B11->ce = (((B->ce - B->cs + 1) / 2) + B->cs) - 1; // Fixed
+    B11->rs = B->rs;
+    B11->re = (((B->re - B->rs + 1) / 2) + B->rs) - 1;
+    B11->cs = B->cs;
+    B11->ce = (((B->ce - B->cs + 1) / 2) + B->cs) - 1;
 
-    B12->rs = B->cs; // Fixed
-    B12->re = (((B->re - B->rs + 1) / 2) + B->rs) - 1; // Fixed
-    B12->cs = ((B->ce - B->cs + 1) / 2) + B->cs; // Fixed
-    B12->ce = B->ce; // Fixed
+    B12->rs = B->cs;
+    B12->re = (((B->re - B->rs + 1) / 2) + B->rs) - 1;
+    B12->cs = ((B->ce - B->cs + 1) / 2) + B->cs;
+    B12->ce = B->ce;
 
-    B21->rs = ((B->re - B->rs + 1) / 2) + B->rs; // Fixed
-    B21->re = B->re; // Fixed
-    B21->cs = B->cs; // Fixed
-    B21->ce = (((B->ce - B->cs + 1) / 2) + B->cs) - 1; // Fixed
+    B21->rs = ((B->re - B->rs + 1) / 2) + B->rs;
+    B21->re = B->re;
+    B21->cs = B->cs;
+    B21->ce = (((B->ce - B->cs + 1) / 2) + B->cs) - 1;
 
-    B22->rs = ((B->re - B->rs + 1) / 2) + B->rs; // Fixed
+    B22->rs = ((B->re - B->rs + 1) / 2) + B->rs;
     B22->re = B->re; //
-    B22->cs = ((B->ce - B->cs + 1) / 2) + B->cs; // Fixed
+    B22->cs = ((B->ce - B->cs + 1) / 2) + B->cs;
     B22->ce = B->ce;
 
 
     // M1 = (A11 + A22) (B11 + B22)
-    #pragma omp task
     mlAddMat(A11, A22, &PP1, size);
-    #pragma omp task
     mlAddMat(B11, B22, &PP2, size);
     // M2 = (A21 + A22) B11
-    #pragma omp task
     mlAddMat(A21, A22, &PP3, size);
     // M5 = (A11 + A12) B22
-    #pragma omp task
     mlAddMat(A11, A12, &PP4, size);
     // M6 = (A21 – A11) (B11 + B12)
-    #pragma omp task
     mlAddMat(B11, B12, &PP5, size);
     // M7 = (A12 – A22) (B21 + B22)
-    #pragma omp task
     mlAddMat(B21, B22, &PP6, size);
-    #pragma omp taskwait
-
     // M3 = A11 (B12 – B22)
-    #pragma omp task
     mlSubtractMat(B12, B22, &PM1, size);
     // M4 = A22 (B21 – B11)
-    #pragma omp task
     mlSubtractMat(B21, B11, &PM2, size);
     // M6 = (A21 – A11) (B11 + B12)
-    #pragma omp task
     mlSubtractMat(A21, A11, &PM3, size);
     // M7 = (A12 – A22) (B21 + B22)
-    #pragma omp task
     mlSubtractMat(A12, A22, &PM4, size);
-    #pragma omp taskwait
 
-    #pragma omp task
+    
     mlMultiplyStrassen(PP1, PP2, &M1, size, offset + 1, 1);
-    #pragma omp task
     mlMultiplyStrassen(PP3, B11, &M2, size, offset + 1, 2);
-    #pragma omp task
     mlMultiplyStrassen(A11, PM1, &M3, size, offset + 1, 3);
-    #pragma omp task
     mlMultiplyStrassen(A22, PM2, &M4, size, offset + 1, 4);
-    #pragma omp task
     mlMultiplyStrassen(PP4, B22, &M5, size, offset + 1, 5);
-    #pragma omp task
     mlMultiplyStrassen(PM3, PP5, &M6, size, offset + 1, 6);
-    #pragma omp task
     mlMultiplyStrassen(PM4, PP6, &M7, size, offset + 1, 7);
-    #pragma omp taskwait
 
     mlDisposeMat(&PP1);
     mlDisposeMat(&PP2);
@@ -234,25 +183,6 @@ void mlMultiplyStrassen(const mlMat *A, const mlMat *B, mlMat **C, int size, int
     mlDisposeMat(&PM2);
     mlDisposeMat(&PM3);
     mlDisposeMat(&PM4);
-
-//    if (M1->re - M1->rs == 3) {
-//        printf("Debug M1 Size: %d\n", M1->re - M1->rs);
-//        mlPrintMat(M1);
-//        printf("Debug M2 Size: %d\n", M2->re - M2->rs);
-//        mlPrintMat(M2);
-//        printf("Debug M3 Size: %d\n", M3->re - M3->rs);
-//        mlPrintMat(M3);
-//        printf("Debug M4 Size: %d\n", M4->re - M4->rs);
-//        mlPrintMat(M4);
-//        printf("Debug M5 Size: %d\n", M5->re - M5->rs);
-//        mlPrintMat(M5);
-//        printf("Debug M6 Size: %d\n", M6->re - M6->rs);
-//        mlPrintMat(M6);
-//        printf("Debug M7 Size: %d\n", M7->re - M7->rs);
-//        mlPrintMat(M7);
-//
-//        printf("\n");
-//    }
 
     mlAddMat(M1, M4, &Q1P1, size);
     mlSubtractMat(Q1P1, M5, &Q1M1, size);
@@ -278,7 +208,6 @@ void mlMultiplyStrassen(const mlMat *A, const mlMat *B, mlMat **C, int size, int
     mlDisposeMat(&M5);
     mlDisposeMat(&M6);
     mlDisposeMat(&M7);
-
 
     for (m1_cols = C11->rs, cols = 0; m1_cols <= C11->re; m1_cols++, cols++)
         for (m1_rows = C11->cs, rows = 0; m1_rows <= C11->ce; m1_rows++, rows++)

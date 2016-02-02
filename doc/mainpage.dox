@@ -1,0 +1,110 @@
+/*! \mainpage Readme
+\tableofcontents
+
+\section section_authors_note Author's Note
+
+The author initially fell in to the mistake of using a more optimized approach before making sure the algorithm actually works well. That first attempt had lead to a dead end. This entire rewritten project will make sure the main problem is solved first before optimization is done.
+
+This is a work in progress. The objective initially is to make sure that the Strassen's Matrix Multiplication Algorithm component works. Right now it works. But it is not in an optimized state. More information can be taken from <https://github.com/bangonkali/matrix>.
+
+\section sec_challenges Challenges
+
+The main challenge is making a library that does Matrix Multiplication using Strassen's Method while taking advantage of SIMD or other parallelization techniques. The author therefore set a list of objectives to meet.
+
+* Working Strassen't Multiplcation Method (Done)
+* Optimize using OpenMP Parallelization (In-progress)
+* Optimize using SIMD
+
+This has been a very educational project for the author.
+*/
+
+/*! \page pageUsage Usage
+\tableofcontents
+Usage guide
+
+\section usageMainSection Example Usage
+
+This project was made to address the challenges listed in \ref sec_challenges. Examples will be based on them.
+
+\subsection subsection0 Prerequisites
+
+- cmake 3.3.2
+- make 4.1
+- doxygen 1.8.11
+- gcc 4.9.3
+
+\subsection subsection1 Installation
+
+1. Download the source from Github. <https://github.com/bangonkali/matrix>
+2. Extract the source folder.
+3. Go to the source folder.
+4. Create a build directory.
+5. Go to the build directory.
+6. `cmake <source_dir> .`
+7. `make`
+8. Example code is in the `demo_src` directory.
+
+\subsection subsection2 Performance & Testing
+
+    #include <stdio.h>
+    #include <math.h>
+    #include <time.h>
+    #include "ml_mult.h"
+
+    int main() {
+    for (int size = 2; size <= 4096; size*=2){
+    int next = (element) pow(2, ceil(log(size) / log(2)));
+
+    mlMat *mD;
+    mlMat *mE;
+    mlMat *mF;
+    mlMat *mG;
+
+    mD = mlNewMat(size);
+    mE = mlNewMat(size);
+    mF = mlNewMat(size);
+    mG = mlNewMat(size);
+
+    for (int i=0; i<size*size; i++){
+    mD->Mat[i] = i+1;
+    mE->Mat[i] = i+1;
+    }
+
+    clock_t start = clock(), diff;
+    mlMultiplySequential(mD->Mat, mE->Mat, mG->Mat, size);
+    diff = clock() - start;
+    long msecSeq = diff * 1000 / CLOCKS_PER_SEC;
+
+    start = clock();
+    mlMultiplyStrassen(mD, mE, &mF, size, 0, 0);
+    diff = clock() - start;
+    long msecStrassen = diff * 1000 / CLOCKS_PER_SEC;
+
+    printf("size: %6d Actual Size: %6d ", next, size);
+    printf("Time Conventional : %10ld ms Time Conventional Strassen: %10d ms ", msecSeq, msecStrassen);
+    printf("Result: %d\n", mlIsArrEquals(mG->Mat, mF->Mat, size));
+    if (!mlIsArrEquals(mG->Mat, mF->Mat, size)){
+    mlPrintMatArray(mD->Mat, size);
+    mlPrintMatArray(mE->Mat, size);
+    mlPrintMatArray(mG->Mat, size);
+    mlPrintMatArray(mF->Mat, size);
+    mlPrintCompare(mG->Mat, mF->Mat, size);
+    }
+
+    mlDisposeMat(&mD);
+    mlDisposeMat(&mE);
+    mlDisposeMat(&mF);
+    mlDisposeMat(&mG);
+    }
+
+    return 0;
+    }
+
+__This is a work in progress__
+
+\subsection subsection3 References
+
+[Intel Strassen's Matrix Multiplication Algorithm
+](https://software.intel.com/sites/default/files/m/c/d/5/3/d/24469-Strassen_akki.pdf)
+
+*/
